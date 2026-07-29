@@ -1,0 +1,34 @@
+<li class="{{ node.css_class }}">
+  <div class="box" data-has-children="{{ 'true' if node.children else 'false' }}">
+    {% if node.children %}
+      <button type="button" class="collapse-toggle" title="Expand / collapse this branch" aria-label="Toggle children">&minus;</button>
+    {% endif %}
+    <div class="member-list{% if node.members|length == 1 %} single{% endif %}">
+      {%- for member in node.members -%}
+        <div class="member-card"
+             role="button"
+             tabindex="0"
+             data-member-id="{{ member.id }}"
+             data-member-name="{{ (member.first_name ~ ' ' ~ member.last_name)|lower }}"
+             title="View {{ member.first_name }} {{ member.last_name }}'s details">
+          {% if member.photo %}
+            <img class="avatar avatar-photo" src="{{ url_for('static', filename='uploads/' + member.photo) }}" alt="{{ member.first_name }}">
+          {% else %}
+            <span class="avatar avatar-{{ (member.gender or 'other')|lower }}">{{ member.first_name[0]|upper }}{{ member.last_name[0]|upper }}</span>
+          {% endif %}
+          <span class="member-name">{{ member.first_name }} {{ member.last_name }}</span>
+        </div>{% if not loop.last %}<span class="member-separator">&amp;</span>{% endif %}
+      {%- endfor -%}
+    </div>
+  </div>
+  {% if node.children %}
+    <ul>
+      {% for child in node.children %}
+        {% set _old_node = node %}
+        {% set node = child %}
+        {% include 'family_tree_node.html' %}
+        {% set node = _old_node %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>

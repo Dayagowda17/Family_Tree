@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Add Family Member - Family Tree{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Add Family Member</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <!-- Basic Information -->
+                    <h5 class="mb-3">Basic Information</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name *</label>
+                            <input type="text" class="form-control" id="first_name" 
+                                   name="first_name" placeholder="First name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" id="last_name" 
+                                   name="last_name" placeholder="Last name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">Gender *</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob">
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <h5 class="mb-3 mt-4">Contact Information</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" 
+                                   name="email" placeholder="Email address">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" 
+                                   name="phone" placeholder="Phone number">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" 
+                                  rows="2" placeholder="Address"></textarea>
+                    </div>
+                    
+                    <!-- Family Relationships -->
+                    <h5 class="mb-3 mt-4">Family Relationships</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="father_id" class="form-label">Father</label>
+                            <select class="form-select" id="father_id" name="father_id">
+                                <option value="">Select father</option>
+                                {% for member in members %}
+                                    <option value="{{ member.id }}">{{ member.get_full_name() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="mother_id" class="form-label">Mother</label>
+                            <select class="form-select" id="mother_id" name="mother_id">
+                                <option value="">Select mother</option>
+                                {% for member in members %}
+                                    <option value="{{ member.id }}">{{ member.get_full_name() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="spouse_id" class="form-label">Spouse</label>
+                        <select class="form-select" id="spouse_id" name="spouse_id">
+                            <option value="">Select spouse</option>
+                            {% for member in members %}
+                                <option value="{{ member.id }}">{{ member.get_full_name() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Biography -->
+                    <h5 class="mb-3 mt-4">Biography</h5>
+                    
+                    <div class="mb-3">
+                        <label for="biography" class="form-label">Biography</label>
+                        <textarea class="form-control" id="biography" name="biography" 
+                                  rows="4" placeholder="Write a biography about this family member..."></textarea>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Add Member
+                        </button>
+                        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

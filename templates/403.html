@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Access Forbidden - Family Tree{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <h1 class="display-1 fw-bold text-warning">403</h1>
+                <h2 class="mb-4">Access Forbidden</h2>
+                <p class="lead mb-4">You don't have permission to access this resource.</p>
+                
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="bi bi-house-door"></i> Go to Dashboard
+                    </a>
+                    <a href="{{ url_for('dashboard.profile') }}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="bi bi-person"></i> My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

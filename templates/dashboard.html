@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Family Tree{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Members</h5>
+                <h2 class="display-4">{{ stats.total_members }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Male Members</h5>
+                <h2 class="display-4">{{ stats.male_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Female Members</h5>
+                <h2 class="display-4">{{ stats.female_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Actions</h5>
+                <a href="{{ url_for('family.add_member') }}" class="btn btn-light btn-sm mt-2">
+                    <i class="bi bi-person-plus"></i> Add Member
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="GET" action="{{ url_for('dashboard.search') }}" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Search members..." required>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Family Members Table -->
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-people"></i> Family Members</h5>
+    </div>
+    <div class="card-body">
+        {% if members.items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Date of Birth</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members.items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ member.get_full_name() }}</strong>
+                                </td>
+                                <td>
+                                    {% if member.gender == 'Male' %}
+                                        <span class="badge bg-primary">Male</span>
+                                    {% elif member.gender == 'Female' %}
+                                        <span class="badge bg-danger">Female</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Other</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if member.dob %}
+                                        {{ member.dob.strftime('%Y-%m-%d') }} (Age: {{ member.get_age() }})
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ member.email or '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('family.view_member', member_id=member.id) }}" 
+                                       class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a href="{{ url_for('family.edit_member', member_id=member.id) }}" 
+                                       class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ url_for('family.delete_member', member_id=member.id) }}" 
+                                          style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if members.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if members.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('dashboard.dashboard', page=members.prev_num) }}">
+                                    Previous
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for page_num in members.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == members.page %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('dashboard.dashboard', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if members.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('dashboard.dashboard', page=members.next_num) }}">
+                                    Next
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> No family members yet. 
+                <a href="{{ url_for('family.add_member') }}">Add the first member</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

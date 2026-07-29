@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Family Tree{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="bi bi-bar-chart"></i> Family Statistics</h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-primary">{{ stats.total_members }}</h3>
+                        <p class="text-muted">Total Members</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-info">{{ stats.generations }}</h3>
+                        <p class="text-muted">Generations</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-success">{{ stats.couples }}</h3>
+                        <p class="text-muted">Couples</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-warning">{{ stats.avg_age }}</h3>
+                        <p class="text-muted">Average Age</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gender Distribution -->
+        <h5 class="mb-3">Gender Distribution</h5>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Male</p>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {{ stats.male_percent }}%">
+                                {{ stats.male_count }} ({{ stats.male_percent }}%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Female</p>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: {{ stats.female_percent }}%">
+                                {{ stats.female_count }} ({{ stats.female_percent }}%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Other</p>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-secondary" role="progressbar" 
+                                 style="width: {{ stats.other_percent }}%">
+                                {{ stats.other_count }} ({{ stats.other_percent }}%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Distribution -->
+        <h5 class="mb-3">Age Groups</h5>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Age Group</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0-10 years</td>
+                        <td>{{ stats.age_0_10 }}</td>
+                        <td>{{ stats.age_0_10_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>11-20 years</td>
+                        <td>{{ stats.age_11_20 }}</td>
+                        <td>{{ stats.age_11_20_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>21-30 years</td>
+                        <td>{{ stats.age_21_30 }}</td>
+                        <td>{{ stats.age_21_30_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>31-40 years</td>
+                        <td>{{ stats.age_31_40 }}</td>
+                        <td>{{ stats.age_31_40_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>41-50 years</td>
+                        <td>{{ stats.age_41_50 }}</td>
+                        <td>{{ stats.age_41_50_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>51-60 years</td>
+                        <td>{{ stats.age_51_60 }}</td>
+                        <td>{{ stats.age_51_60_pct }}%</td>
+                    </tr>
+                    <tr>
+                        <td>61+ years</td>
+                        <td>{{ stats.age_61_plus }}</td>
+                        <td>{{ stats.age_61_plus_pct }}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Notable Members -->
+        <h5 class="mb-3 mt-4">Notable Members</h5>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title text-success">Oldest Member</h6>
+                        <p class="card-text">
+                            <strong>{{ stats.oldest_name }}</strong><br>
+                            <small class="text-muted">Age: {{ stats.oldest_age }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title text-info">Youngest Member</h6>
+                        <p class="card-text">
+                            <strong>{{ stats.youngest_name }}</strong><br>
+                            <small class="text-muted">Age: {{ stats.youngest_age }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title text-warning">Most Children</h6>
+                        <p class="card-text">
+                            <strong>{{ stats.most_children_name }}</strong><br>
+                            <small class="text-muted">Children: {{ stats.most_children_count }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">Export Statistics</h6>
+                <a href="#" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-file-earmark-pdf"></i> Export as PDF
+                </a>
+                <a href="#" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export as CSV
+                </a>
+            </div>
+            
+            <div class="col-md-6 text-end">
+                <h6 class="mb-3">Actions</h6>
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

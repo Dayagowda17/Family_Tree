@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Flask Web Application
+  web:
+    build: .
+    container_name: family_tree_web
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://family_user:family_password@db:5432/family_tree
+      - SECRET_KEY=dev-secret-key-change-in-production
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - ./static/uploads:/app/static/uploads
+    depends_on:
+      - db
+    command: flask run --host=0.0.0.0
+    networks:
+      - family_network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: family_tree_db
+    environment:
+      - POSTGRES_USER=family_user
+      - POSTGRES_PASSWORD=family_password
+      - POSTGRES_DB=family_tree
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - family_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U family_user -d family_tree"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin for Database Management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: family_tree_pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - family_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  family_network:
+    driver: bridge

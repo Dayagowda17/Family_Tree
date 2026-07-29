@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Family Tree - Family Tree App{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        {% if tree %}
+            <!-- Toolbar -->
+            <div class="tree-toolbar d-flex flex-wrap align-items-center gap-3 mb-3">
+                <div class="tree-search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="tree-search" class="form-control" placeholder="Find a family member...">
+                </div>
+
+                <div class="tree-zoom-controls btn-group ms-auto" role="group" aria-label="Zoom controls">
+                    <button type="button" id="zoom-out" class="btn btn-outline-secondary" title="Zoom out">
+                        <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <button type="button" id="zoom-reset" class="btn btn-outline-secondary" title="Reset zoom">
+                        <i class="bi bi-aspect-ratio"></i>
+                    </button>
+                    <button type="button" id="zoom-in" class="btn btn-outline-secondary" title="Zoom in">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+
+                <div class="tree-legend d-flex align-items-center gap-3">
+                    <span class="legend-item"><span class="legend-swatch avatar-male"></span> Male</span>
+                    <span class="legend-item"><span class="legend-swatch avatar-female"></span> Female</span>
+                    <span class="legend-item"><span class="legend-swatch avatar-other"></span> Other</span>
+                </div>
+            </div>
+            <p class="text-muted small mb-3">
+                <i class="bi bi-info-circle"></i>
+                Click on a name to see full details. Use <strong>&minus;</strong> on a box to collapse its branch, and the search box above to jump straight to someone.
+            </p>
+
+            <div class="tree-viewport" id="tree-viewport">
+                <div class="tree" id="family-tree">
+                    <ul>
+                        {% for node in tree %}
+                            {% include 'family_tree_node.html' %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> No family members yet. 
+                <a href="{{ url_for('family.add_member') }}">Add members</a> to view your family tree.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Member Detail Modal -->
+<div class="modal fade" id="memberModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" id="memberModalContent">
+        <div class="modal-body text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/family-tree.js') }}"></script>
+{% endblock %}
