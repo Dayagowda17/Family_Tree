@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}{{ owner.first_name or owner.username }}'s Family Tree{% endblock %}
+{% block title %}Family Tree - Shared View{% endblock %}
 
 {% block content %}
 <div class="alert alert-secondary d-flex align-items-center gap-2 mb-4" role="alert">
     <i class="bi bi-eye"></i>
     <div>
-        You're viewing <strong>{{ owner.first_name or owner.username }}'s</strong> family tree as a shared, read-only link.
+        You're viewing this <strong>family tree</strong> as a shared, read-only link.
         No account is needed to view this page.
     </div>
 </div>
