@@ -8,6 +8,7 @@ from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.family import family_bp
 from routes.upload import upload_bp
+from routes.public import public_bp
 
 # Create Flask application
 app = Flask(__name__)
@@ -30,9 +31,10 @@ login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
 
+
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 
 # Register blueprints
@@ -40,6 +42,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(family_bp)
 app.register_blueprint(upload_bp)
+app.register_blueprint(public_bp)
 
 
 # Context processors

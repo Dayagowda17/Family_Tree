@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ member.get_full_name() }} - Family Tree{% endblock %}
+{% block title %}{% if member %}{{ member.get_full_name() }}{% else %}My profile{% endif %} - Family Tree{% endblock %}
 
 {% block content %}
 {% if member %}
@@ -89,7 +89,7 @@
                             <p class="text-muted">Born: {{ member.dob.strftime('%B %d, %Y') }}</p>
                         {% endif %}
                     </div>
-                    {% if member.user_id == current_user.id %}
+                    {% if member.user_id == current_user.id and current_user.is_admin() %}
                         <div class="btn-group">
                             <a href="{{ url_for('family.edit_member', member_id=member.id) }}" 
                                class="btn btn-warning">

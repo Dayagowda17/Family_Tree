@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from models import db
 from models.family import FamilyMember
+from auth_decorators import admin_required
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -10,7 +11,7 @@ dashboard_bp = Blueprint('dashboard', __name__)
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.dashboard'))
-    return redirect(url_for('auth.login'))
+    return render_template('index.html')
 
 
 @dashboard_bp.route('/dashboard')
@@ -24,6 +25,29 @@ def dashboard():
         'female_count': FamilyMember.query.filter_by(user_id=current_user.id, gender='Female').count(),
     }
     return render_template('dashboard.html', members=members, stats=stats)
+
+
+@dashboard_bp.route('/share')
+@login_required
+@admin_required
+def share():
+    """Show the public, no-login link for external users - Admin only"""
+    current_user.ensure_share_token()
+    db.session.commit()
+    public_url = url_for('public.public_tree', share_token=current_user.share_token, _external=True)
+    return render_template('share.html', public_url=public_url)
+
+
+@dashboard_bp.route('/share/regenerate', methods=['POST'])
+@login_required
+@admin_required
+def regenerate_share():
+    """Invalidate the old public link and create a new one - Admin only"""
+    import secrets
+    current_user.share_token = secrets.token_urlsafe(16)
+    db.session.commit()
+    flash('Your public link has been regenerated. The old link no longer works.', 'success')
+    return redirect(url_for('dashboard.share'))
 
 
 @dashboard_bp.route('/profile')

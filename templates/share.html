@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Share your family tree - Family Tree App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-share"></i> Share your family tree</h4>
+            </div>
+            <div class="card-body">
+                <p>
+                    Anyone with this link can view your family tree and member profiles — they don't need an
+                    account and won't be able to add, edit, or delete anything.
+                </p>
+                <div class="input-group mb-3">
+                    <input type="text" id="public-link" class="form-control" value="{{ public_url }}" readonly>
+                    <button class="btn btn-outline-secondary" type="button" onclick="copyLink()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ url_for('dashboard.regenerate_share') }}"
+                      onsubmit="return confirm('This will invalidate the current link. Anyone using the old link will lose access. Continue?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-arrow-repeat"></i> Regenerate link
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyLink() {
+    const input = document.getElementById('public-link');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value);
+}
+</script>
+{% endblock %}

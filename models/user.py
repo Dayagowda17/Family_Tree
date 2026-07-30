@@ -2,6 +2,7 @@ from models import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import secrets
 
 
 class User(UserMixin, db.Model):
@@ -13,6 +14,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
+    role = db.Column(db.String(20), default='user', nullable=False)  # 'admin' or 'user'
+    share_token = db.Column(db.String(64), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -26,6 +29,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         """Check if provided password matches hash"""
         return check_password_hash(self.password_hash, password)
+    
+    def is_admin(self):
+        """Check if user is admin"""
+        return self.role == 'admin'
+    
+    def ensure_share_token(self):
+        """Return the existing public share token, generating one if needed"""
+        if not self.share_token:
+            self.share_token = secrets.token_urlsafe(16)
+        return self.share_token
     
     def __repr__(self):
         return f'<User {self.username}>'

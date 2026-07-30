@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ owner.first_name or owner.username }}'s Family Tree{% endblock %}
+
+{% block content %}
+<div class="alert alert-secondary d-flex align-items-center gap-2 mb-4" role="alert">
+    <i class="bi bi-eye"></i>
+    <div>
+        You're viewing <strong>{{ owner.first_name or owner.username }}'s</strong> family tree as a shared, read-only link.
+        No account is needed to view this page.
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        {% if tree %}
+            <div class="tree-legend d-flex align-items-center gap-3 mb-3">
+                <span class="legend-item"><span class="legend-swatch avatar-male"></span> Male</span>
+                <span class="legend-item"><span class="legend-swatch avatar-female"></span> Female</span>
+                <span class="legend-item"><span class="legend-swatch avatar-other"></span> Other</span>
+            </div>
+            <p class="text-muted small mb-3">
+                <i class="bi bi-info-circle"></i>
+                Click on a name to see that person's details.
+            </p>
+
+            <div class="tree-viewport" id="tree-viewport">
+                <div class="tree" id="family-tree">
+                    <ul>
+                        {% for node in tree %}
+                            {% include 'public_tree_node.html' %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> This family tree doesn't have any members yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

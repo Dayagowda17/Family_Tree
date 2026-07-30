@@ -68,6 +68,17 @@
 </div>
 {% endblock %}
 
+
+
+
+{% if is_admin or current_user.is_admin() %}
+    <a href="{{ url_for('family.edit_member', member_id=member.id) }}" class="btn btn-warning">Edit</a>
+    <form method="POST" action="{{ url_for('family.delete_member', member_id=member.id) }}" style="display:inline;">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+    </form>
+{% endif %}
+
+
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/family-tree.js') }}"></script>
 {% endblock %}

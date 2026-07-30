@@ -4,13 +4,16 @@ from flask_login import login_required, current_user
 from models import db
 from models.family import FamilyMember
 from datetime import datetime
+from auth_decorators import admin_required
 
 family_bp = Blueprint('family', __name__, url_prefix='/family')
 
 
 @family_bp.route('/add', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def add_member():
+    """Add a new family member - Admin only"""
     if request.method == 'POST':
         try:
             first_name = request.form.get('first_name', '').strip()
@@ -72,6 +75,7 @@ def add_member():
 @family_bp.route('/<int:member_id>')
 @login_required
 def view_member(member_id):
+    """View a family member's profile - All users can view"""
     member = FamilyMember.query.get_or_404(member_id)
     
     # Check if current user owns this member
@@ -86,9 +90,9 @@ def view_member(member_id):
 @family_bp.route('/api/member/<int:member_id>')
 @login_required
 def member_detail_api(member_id):
-    """Return full details for a single member as JSON, used by the
-    family-tree 'click a name' modal so the whole tree page stays intuitive
-    and in-place (no full page reload needed)."""
+    """Return full details for a single member as JSON - All users can access
+    Used by the family-tree 'click a name' modal so the whole tree page stays 
+    intuitive and in-place (no full page reload needed)."""
     member = FamilyMember.query.get_or_404(member_id)
 
     if member.user_id != current_user.id:
@@ -106,14 +110,19 @@ def member_detail_api(member_id):
     data['spouse'] = {'id': member.spouse.id, 'name': member.spouse.get_full_name()} if member.spouse else None
     data['children'] = [{'id': c.id, 'name': c.get_full_name()} for c in children]
     data['profile_url'] = url_for('family.view_member', member_id=member.id)
-    data['edit_url'] = url_for('family.edit_member', member_id=member.id)
-
+    
+    # Only include edit URL if user is admin
+    if current_user.is_admin():
+        data['edit_url'] = url_for('family.edit_member', member_id=member.id)
+    
     return jsonify(data)
 
 
 @family_bp.route('/<int:member_id>/edit', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def edit_member(member_id):
+    """Edit a family member - Admin only"""
     member = FamilyMember.query.get_or_404(member_id)
     
     if member.user_id != current_user.id:
@@ -161,7 +170,9 @@ def edit_member(member_id):
 
 @family_bp.route('/<int:member_id>/delete', methods=['POST'])
 @login_required
+@admin_required
 def delete_member(member_id):
+    """Delete a family member - Admin only"""
     member = FamilyMember.query.get_or_404(member_id)
     
     if member.user_id != current_user.id:
@@ -298,15 +309,16 @@ def build_family_tree(members):
 @family_bp.route('/tree')
 @login_required
 def family_tree():
+    """View the family tree - All users can view"""
     members = FamilyMember.query.filter_by(user_id=current_user.id).all()
     tree_data = build_family_tree(members)
-    return render_template('family_tree.html', tree=tree_data, members=members)
+    return render_template('family_tree.html', tree=tree_data, members=members, is_admin=current_user.is_admin())
 
 
 @family_bp.route('/tree_debug')
 @login_required
 def family_tree_debug():
-    """Return JSON with groups, mappings and tree for debugging circular/incorrect links."""
+    """Return JSON with groups, mappings and tree for debugging - All users can access"""
     members = FamilyMember.query.filter_by(user_id=current_user.id).all()
 
     # Recreate groups similarly to build_family_tree for debugging

@@ -80,10 +80,12 @@
                                        class="btn btn-outline-primary">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <a href="{{ url_for('family.edit_member', member_id=member.id) }}" 
-                                       class="btn btn-outline-warning">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </a>
+                                    {% if current_user.is_admin() %}
+                                        <a href="{{ url_for('family.edit_member', member_id=member.id) }}" 
+                                           class="btn btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -93,8 +95,10 @@
         {% elif query %}
             <div class="alert alert-info" role="alert">
                 <i class="bi bi-info-circle"></i> 
-                No results found for "<strong>{{ query }}</strong>". 
-                <a href="{{ url_for('family.add_member') }}">Add a new member</a>.
+                No results found for "<strong>{{ query }}</strong>".
+                {% if current_user.is_admin() %}
+                    <a href="{{ url_for('family.add_member') }}">Add a new member</a>.
+                {% endif %}
             </div>
         {% else %}
             <div class="alert alert-info" role="alert">
