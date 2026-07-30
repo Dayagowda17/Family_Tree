@@ -14,7 +14,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
-    role = db.Column(db.String(20), default='user', nullable=False)  # 'admin' or 'user'
+    role = db.Column(db.String(20), default='admin', nullable=False)  # CHANGED: 'admin' or 'user' - default is NOW admin
     share_token = db.Column(db.String(64), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
