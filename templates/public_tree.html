@@ -14,6 +14,9 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         {% if tree %}
+            {% if family_name %}
+                <h2 class="text-center mb-4 family-tree-title">The {{ family_name }} Family Tree</h2>
+            {% endif %}
             <div class="tree-legend d-flex align-items-center gap-3 mb-3">
                 <span class="legend-item"><span class="legend-swatch avatar-male"></span> Male</span>
                 <span class="legend-item"><span class="legend-swatch avatar-female"></span> Female</span>

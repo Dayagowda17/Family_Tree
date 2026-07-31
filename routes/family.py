@@ -3,7 +3,7 @@ from flask import jsonify
 from flask_login import login_required, current_user
 from models import db
 from models.family import FamilyMember
-from datetime import datetime
+from datetime import datetime, date
 from auth_decorators import admin_required
 
 family_bp = Blueprint('family', __name__, url_prefix='/family')
@@ -192,6 +192,15 @@ def delete_member(member_id):
     return redirect(url_for('dashboard.dashboard'))
 
 
+def _group_age_key(group):
+    """Return the earliest (oldest) date of birth among a group's members.
+    Groups/members without a dob are treated as the youngest so they sort last."""
+    dobs = [m.dob for m in group['members'] if m.dob]
+    if dobs:
+        return min(dobs)
+    return date.max
+
+
 def build_family_tree(members):
     member_by_id = {member.id: member for member in members}
     group_by_member = {}
@@ -243,7 +252,10 @@ def build_family_tree(members):
                 seen.add(mid)
                 unique_ids.append(mid)
         # convert ids to member objects and sort
-        members_sorted = sorted([member_by_id[i] for i in unique_ids], key=lambda x: (x.last_name or '', x.first_name or ''))
+        members_sorted = sorted(
+            [member_by_id[i] for i in unique_ids],
+            key=lambda x: (x.dob if x.dob else date.max, x.last_name or '', x.first_name or '')
+        )
         groups[key]['members'] = members_sorted
 
     # Build parent-child group relationships: each child belongs to its own group; parents' groups link to child's group
@@ -275,7 +287,7 @@ def build_family_tree(members):
         else:
             css_class = 'child'
 
-        children_keys = sorted(group['children'], key=lambda key: groups[key]['members'][0].last_name or '')
+        children_keys = sorted(group['children'], key=lambda key: _group_age_key(groups[key]))
         children_nodes = []
         for child_key in children_keys:
             if child_key in visited:
@@ -302,7 +314,7 @@ def build_family_tree(members):
         }
 
     root_keys = [key for key, group in groups.items() if not group['parents']]
-    root_keys = sorted(root_keys, key=lambda key: groups[key]['members'][0].last_name or '')
+    root_keys = sorted(root_keys, key=lambda key: _group_age_key(groups[key]))
     return [make_group_node(root_key, root=True if i == 0 else False) for i, root_key in enumerate(root_keys)]
 
 
@@ -312,7 +324,25 @@ def family_tree():
     """View the family tree - All users can view"""
     members = FamilyMember.query.filter_by(user_id=current_user.id).all()
     tree_data = build_family_tree(members)
-    return render_template('family_tree.html', tree=tree_data, members=members, is_admin=current_user.is_admin())
+
+    family_name = current_user.family_name
+    if not family_name and members:
+        last_names = [m.last_name.strip() for m in members if m.last_name and m.last_name.strip()]
+        if last_names:
+            # Group case-insensitively so "KS" and "ks" count as the same surname
+            counts = {}
+            for ln in last_names:
+                key = ln.lower()
+                counts.setdefault(key, {'count': 0, 'display': ln})
+                counts[key]['count'] += 1
+                # Prefer an ALL-CAPS or Title-Case version for display if we see one
+                if ln.isupper() or (ln[0].isupper() and not counts[key]['display'][0].isupper()):
+                    counts[key]['display'] = ln
+            best_key = max(counts, key=lambda k: counts[k]['count'])
+            family_name = counts[best_key]['display']
+
+    return render_template('family_tree.html', tree=tree_data, members=members,
+                            family_name=family_name, is_admin=current_user.is_admin())
 
 
 @family_bp.route('/tree_debug')

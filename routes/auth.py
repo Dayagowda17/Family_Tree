@@ -18,10 +18,15 @@ def register():
         confirm_password = request.form.get('confirm_password', '')
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
+        family_name = request.form.get('family_name', '').strip()
         
         # Validation
         if not username or not email or not password:
             flash('Username, email, and password are required', 'danger')
+            return redirect(url_for('auth.register'))
+        
+        if not family_name:
+            flash('Family name is required', 'danger')
             return redirect(url_for('auth.register'))
         
         if password != confirm_password:
@@ -46,7 +51,8 @@ def register():
             username=username,
             email=email,
             first_name=first_name,
-            last_name=last_name
+            last_name=last_name,
+            family_name=family_name
         )
         user.set_password(password)
         

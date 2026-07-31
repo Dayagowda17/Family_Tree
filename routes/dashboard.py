@@ -56,6 +56,22 @@ def profile():
     return render_template('profile.html', user=current_user)
 
 
+@dashboard_bp.route('/profile/family-name', methods=['POST'])
+@login_required
+def update_family_name():
+    """Set or change the family name shown at the top of the family tree."""
+    family_name = request.form.get('family_name', '').strip()
+
+    if not family_name:
+        flash('Family name cannot be empty', 'danger')
+        return redirect(url_for('dashboard.profile'))
+
+    current_user.family_name = family_name
+    db.session.commit()
+    flash('Family name updated successfully', 'success')
+    return redirect(url_for('dashboard.profile'))
+
+
 @dashboard_bp.route('/search')
 @login_required
 def search():

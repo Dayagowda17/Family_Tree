@@ -8,6 +8,9 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         {% if tree %}
+            {% if family_name %}
+                <h2 class="text-center mb-4 family-tree-title">The {{ family_name }} Family Tree</h2>
+            {% endif %}
             <!-- Toolbar -->
             <div class="tree-toolbar d-flex flex-wrap align-items-center gap-3 mb-3">
                 <div class="tree-search-box">
